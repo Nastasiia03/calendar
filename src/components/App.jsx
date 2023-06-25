@@ -1,26 +1,62 @@
-import DatePicker from "react-multi-date-picker";
-import "react-datepicker/dist/react-datepicker.css";
-import { useState } from 'react';
+import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { Calendar, CalendarButton, CalendarHeader, NameOfDay, Period } from './Calendar.styled';
 
-const weekDays = ["S", "M", "T", "W", "T", "F", "S"]
 
-export const App = () => {
+const SmallCalendar = () => {
   const [startDate, setStartDate] = useState(new Date());
+
+  const CustomInput = React.forwardRef(({ value, onClick }, ref) => (
+    <CalendarButton className="custom-input" onClick={onClick} ref={ref}>
+      {value}
+    </CalendarButton >
+  ));
+
+  const CustomContainer = ({ children }) => (
+    <Calendar>
+      {children}
+    </Calendar>
+  );
+
+  const CustomHeader = ({ date, decreaseMonth, increaseMonth }) => {
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    const year = date.getFullYear();
+  
+    return (
+      <CalendarHeader >
+        <button onClick={decreaseMonth}>{'<'}</button>
+        <Period>
+          {month} {year}
+        </Period>
+        <button onClick={increaseMonth}>{'>'}</button>
+      </CalendarHeader >
+    );
+  };
+  
+  const CustomDaysOfWeek = (day) => {
+
+    return (
+      <NameOfDay>
+        {day.substr(0,1)}
+      </NameOfDay>
+    );
+  };
+
+
   return (
-    <DatePicker value={startDate}
+    <DatePicker selected={startDate}
       onChange={(date) => setStartDate(date)}
-      className="custom-calendar"
-      weekStartDayIndex={1}
-      arrow={false}
-      weekDays={weekDays}
-   mapDays={({ date }) => {
-    let props = {}
-    let isWeekend = [0, 6].includes(date.weekDay.index)
-    
-    if (isWeekend) props.className = "highlight"
-    
-    return props
-  }}
+      customInput={<CustomInput />}
+      dateFormat="d MMM yyyy"
+      calendarStartDay={1}
+      formatWeekDay={CustomDaysOfWeek}
+      fixedHeight
+      calendarContainer={CustomContainer}
+      renderCustomHeader={CustomHeader}
+      
 />
   );
 }
+
+export default SmallCalendar;
